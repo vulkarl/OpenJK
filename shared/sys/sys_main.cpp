@@ -162,8 +162,8 @@ void Sys_Init( void ) {
 #else
 	com_maxfps = Cvar_Get( "com_maxfps", "125", CVAR_ARCHIVE, "Maximum frames per second" );
 #endif
-	com_maxfpsUnfocused = Cvar_Get( "com_maxfpsUnfocused", "0", CVAR_ARCHIVE );
-	com_maxfpsMinimized = Cvar_Get( "com_maxfpsMinimized", "50", CVAR_ARCHIVE );
+	com_maxfpsUnfocused = Cvar_Get( "com_maxfpsUnfocused", "0", CVAR_ARCHIVE_ND );
+	com_maxfpsMinimized = Cvar_Get( "com_maxfpsMinimized", "50", CVAR_ARCHIVE_ND );
 }
 
 static void NORETURN Sys_Exit( int ex ) {
@@ -469,7 +469,7 @@ void *Sys_LoadLegacyGameDll( const char *name, VMMainProc **vmMain, SystemCallPr
 	Com_sprintf (filename, sizeof(filename), "%s" ARCH_STRING DLL_EXT, name);
 
 #if defined(_DEBUG)
-	libHandle = Sys_LoadLibrary( name );
+	libHandle = Sys_LoadLibrary( filename );
 	if ( !libHandle )
 #endif
 	{
@@ -769,6 +769,17 @@ int main ( int argc, char* argv[] )
 	}
 
 	Com_Init (commandLine);
+
+#ifndef DEDICATED
+	SDL_version compiled;
+	SDL_version linked;
+
+	SDL_VERSION( &compiled );
+	SDL_GetVersion( &linked );
+
+	Com_Printf( "SDL Version Compiled: %d.%d.%d\n", compiled.major, compiled.minor, compiled.patch );
+	Com_Printf( "SDL Version Linked: %d.%d.%d\n", linked.major, linked.minor, linked.patch );
+#endif
 
 	NET_Init();
 
